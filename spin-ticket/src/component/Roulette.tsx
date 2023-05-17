@@ -91,7 +91,6 @@ export const Roulette: React.FC<Props> = (props: Props) => {
   };
 
   const draw = (p5: p5Types) => {
-    console.log(angle % 360);
     p5.background("rgba(255,255,255, 1)");
     p5.translate(p5.width / 2, p5.height / 2);
 
