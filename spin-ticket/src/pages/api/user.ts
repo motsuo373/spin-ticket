@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as admin from "firebase-admin";
 
-const serviceAccount = require("../../../firebase.json"); // 秘密鍵を取得
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -14,10 +12,27 @@ export default async function handler(
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
+  let firebaseApp;
+
+  // Check if required environment variables are defined
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_PRIVATE_KEY ||
+    !process.env.FIREBASE_CLIENT_EMAIL
+  ) {
+    throw new Error("Missing Firebase environment variables.");
+  }
+
   if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+    firebaseApp = admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
     });
+  } else {
+    firebaseApp = admin.app();
   }
 
   const db = admin.firestore();

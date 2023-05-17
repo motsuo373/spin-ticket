@@ -27,7 +27,6 @@ export const Spin: FC = () => {
         },
       });
       setIsFetchData(true);
-      console.log(response.data);
     } catch (error) {
       setIsFetchData(false);
       console.error(error);
