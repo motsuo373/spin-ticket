@@ -4,7 +4,7 @@ import React from "react";
 
 export const Header = () => {
   return (
-    <Box px={4} bgColor="yellow.200">
+    <Box px={4} bgColor="yellow.800">
       <Container maxW="container.lg">
         <Flex
           as="header"
@@ -14,7 +14,13 @@ export const Header = () => {
         >
           <Flex alignItems="center">
             <Image src="/target.png" alt="logo" width={50} height={50} />
-            <Heading as="h1" fontSize="2xl" cursor="pointer" marginLeft={4}>
+            <Heading
+              as="h1"
+              fontSize="2xl"
+              cursor="pointer"
+              marginLeft={4}
+              color={"white"}
+            >
               もつおバウンティ
             </Heading>
           </Flex>

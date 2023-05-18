@@ -14,6 +14,9 @@ const {
 
 module.exports = {
   reactStrictMode: true,
+  experimental: {
+    optimizeFonts: true,
+  },
   env: {
     FIREBASE_TYPE,
     FIREBASE_PROJECT_ID,
