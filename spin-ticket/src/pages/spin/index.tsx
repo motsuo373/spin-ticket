@@ -45,13 +45,12 @@ export const Spin: FC = () => {
       console.error(error);
     }
   };
-
-  const { onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
       <Header />
-      {fetchData && (
+      {Object.keys(fetchData).length > 0 && (
         <Container
           maxW="container.xl"
           height={"calc(100vh - 82px)"}
