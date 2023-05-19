@@ -11,6 +11,7 @@ const Sketch = dynamic(() => import("react-p5").then((mod) => mod.default), {
 interface Props {
   isSpinning: boolean;
   setIsSpinEnd: React.Dispatch<React.SetStateAction<boolean>>;
+  targetNum: number;
 }
 
 const ROULETTE_NUM = 6;
@@ -34,8 +35,6 @@ let angle = 0;
 let angleSpeed = 0.2;
 let hasIncreasedSpeed = false;
 let reachedTarget = false;
-
-let targetAngle = 180 - 122;
 
 const drawRoulette = (p5: p5Types, angle: number) => {
   for (let i = 0; i < ROULETTE_NUM; i++) {
@@ -69,7 +68,8 @@ let hasSpinToEnd = false;
 const updateAngleSpeed = (
   p5: p5Types,
   isSpinning: boolean,
-  setIsSpinEnd: any
+  setIsSpinEnd: any,
+  targetAngle: number
 ) => {
   if (isSpinning) {
     if (!hasIncreasedSpeed) {
@@ -83,7 +83,7 @@ const updateAngleSpeed = (
     }
 
     if (reachedTarget) {
-      angleSpeed -= 0.005;
+      angleSpeed -= 0.0005;
       if (angleSpeed < 0) {
         angleSpeed = 0;
         if (!hasSpinToEnd) {
@@ -109,6 +109,7 @@ const drawNeedle = (p5: p5Types) => {
 };
 
 export const Roulette: React.FC<Props> = (props: Props) => {
+  const targetAngle = (props.targetNum * 60 + 14) % 360;
   const preload = (p5: p5Types) => {
     // Load the pattern image
   };
@@ -123,7 +124,7 @@ export const Roulette: React.FC<Props> = (props: Props) => {
     p5.background("rgba(47,133,90, 1)");
     p5.translate(p5.width / 2, p5.height / 2);
 
-    updateAngleSpeed(p5, props.isSpinning, props.setIsSpinEnd);
+    updateAngleSpeed(p5, props.isSpinning, props.setIsSpinEnd, targetAngle);
 
     angle += angleSpeed;
 

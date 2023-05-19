@@ -25,7 +25,7 @@ export const Spin: FC = () => {
   const router = useRouter();
 
   const [fetchData, setFetchData] = useState<any>({});
-  const { amount, link } = fetchData;
+  const { amount, link, targetNum } = fetchData;
 
   const { order } = router.query;
 
@@ -71,7 +71,11 @@ export const Spin: FC = () => {
               </CardBody>
             </Card>
 
-            <Roulette isSpinning={isSpinning} setIsSpinEnd={setIsSpinEnd} />
+            <Roulette
+              isSpinning={isSpinning}
+              setIsSpinEnd={setIsSpinEnd}
+              targetNum={targetNum}
+            />
             <Button
               bgColor={"yellow.400"}
               textColor={"white"}
