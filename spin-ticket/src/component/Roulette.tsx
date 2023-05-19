@@ -110,16 +110,6 @@ const drawNeedle = (p5: p5Types) => {
   p5.pop();
 };
 
-const drawCenterImage = (p5: p5Types) => {
-  p5.push();
-  const radius = 120;
-  const mask = p5.createGraphics(img.width, img.height);
-  mask.circle(mask.width / 2, mask.height / 2, radius);
-  img.mask(mask.get());
-  p5.image(img, -radius / 2, -radius / 2, radius, radius);
-  p5.pop();
-};
-
 export const Roulette: React.FC<Props> = (props: Props) => {
   const targetAngle = (props.targetNum * 60 + 14) % 360;
   const preload = (p5: p5Types) => {
@@ -143,7 +133,6 @@ export const Roulette: React.FC<Props> = (props: Props) => {
 
     drawRoulette(p5, angle);
     drawNeedle(p5);
-    drawCenterImage(p5);
     p5.loop();
   };
   return (

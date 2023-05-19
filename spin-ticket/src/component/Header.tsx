@@ -13,7 +13,7 @@ export const Header = () => {
           alignItems="center"
         >
           <Flex alignItems="center">
-            <Image src="/target.png" alt="logo" width={50} height={50} />
+            <Image src="/kings-logo.png" alt="logo" width={50} height={50} />
             <Heading
               as="h1"
               fontSize="2xl"

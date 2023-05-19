@@ -7,6 +7,33 @@ export default async function handler(
 ) {
   const COLLECTION_NAME = "uuid";
 
+  const db = admin.firestore();
+
+  if (req.method === "POST") {
+    const { field, value } = req.body;
+
+    if (!field || !value) {
+      return res
+        .status(400)
+        .json({ error: "Missing field or value in request body" });
+    }
+
+    const documentId = req.query.documentId;
+    if (!documentId) {
+      return res.status(400).json({ error: "Missing documentId parameter" });
+    }
+
+    try {
+      const docRef = db.collection(COLLECTION_NAME).doc(documentId.toString());
+      await docRef.update({ [field]: value });
+      res.status(200).json({ message: "Field updated successfully" });
+    } catch (error) {
+      console.error("Error updating document:", error);
+      res.status(500).json({ error: "Error updating document" });
+    }
+    return;
+  }
+
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
@@ -34,8 +61,6 @@ export default async function handler(
   } else {
     firebaseApp = admin.app();
   }
-
-  const db = admin.firestore();
 
   try {
     const documentId = req.query.documentId;

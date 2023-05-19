@@ -27,7 +27,7 @@ export const Spin: FC = () => {
   const router = useRouter();
 
   const [fetchData, setFetchData] = useState<any>({});
-  const { amount, link, targetNum } = fetchData;
+  const { amount, link, targetNum, isUsed } = fetchData;
 
   const { order } = router.query;
 
@@ -36,6 +36,41 @@ export const Spin: FC = () => {
       getUser(order);
     }
   }, [order]);
+
+  useEffect(() => {
+    if (isSpinEnd) {
+      if (typeof order === "string") {
+        updateDocumentField(order, "isUsed", true);
+        updateDocumentField(order, "updateAt", new Date());
+      } else {
+        console.error("Invalid order value:", order);
+      }
+    }
+  }, [isSpinEnd]);
+
+  async function updateDocumentField(
+    documentId: string,
+    field: any,
+    value: any
+  ) {
+    try {
+      const response = await fetch(`/api/user?documentId=${documentId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ field, value }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+    } catch (error) {
+      console.error("Error updating document field:", error);
+    }
+  }
 
   const getUser = async (documentId: any) => {
     try {
@@ -101,7 +136,7 @@ export const Spin: FC = () => {
             </Button>
 
             <Modal
-              isOpen={isSpinEnd}
+              isOpen={isSpinEnd || isUsed}
               onClose={onClose}
               size={"sm"}
               motionPreset="slideInBottom"
