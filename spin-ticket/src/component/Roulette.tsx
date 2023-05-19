@@ -54,7 +54,7 @@ const drawRoulette = (p5: p5Types, angle: number) => {
     p5.translate(100, 60);
     p5.rotate(-radians);
     p5.textFont("Abril Fatface");
-    p5.textSize(24);
+    p5.textSize(32);
     p5.textAlign(p5.CENTER, p5.CENTER);
     p5.fill(255);
     p5.text(rouletteText[i], 0, 0);
@@ -98,14 +98,25 @@ const updateAngleSpeed = (
   p5.noLoop();
 };
 
+// 下向きの三角形（針）を描画する関数を追加
+const drawNeedle = (p5: p5Types) => {
+  p5.push();
+  p5.fill("#ff0000"); // 三角形の色
+  p5.stroke(255);
+  p5.strokeWeight(3);
+  p5.triangle(0, -150, -10, -175, 10, -175);
+  p5.pop();
+};
+
 export const Roulette: React.FC<Props> = (props: Props) => {
   const preload = (p5: p5Types) => {
     // Load the pattern image
   };
   const setup = (p5: p5Types, canvasParentRef: Element) => {
-    p5.createCanvas(400, 400).parent(canvasParentRef);
+    p5.createCanvas(360, 360).parent(canvasParentRef);
 
     drawRoulette(p5, angle);
+    drawNeedle(p5);
   };
 
   const draw = (p5: p5Types) => {
@@ -117,6 +128,7 @@ export const Roulette: React.FC<Props> = (props: Props) => {
     angle += angleSpeed;
 
     drawRoulette(p5, angle);
+    drawNeedle(p5);
     p5.loop();
   };
   return (

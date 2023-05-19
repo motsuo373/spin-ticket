@@ -3,6 +3,8 @@ import { Roulette } from "@/component/Roulette";
 import {
   Box,
   Button,
+  Card,
+  CardBody,
   Container,
   Flex,
   Modal,
@@ -57,16 +59,25 @@ export const Spin: FC = () => {
           bgColor={"green.600"}
         >
           <Flex direction="column" alignItems="center" justifyContent="center">
-            <Text fontSize="xl">
-              本日は参加いただきありがとうございます！
-              <br />
-            </Text>
+            <Card bg="green.100" my={6}>
+              <CardBody>
+                <Text fontSize="md">
+                  Amazonギフト券を当てよう！
+                  <br />
+                  ルーレットの停止した数字が当たりの金額になります。
+                  <br />
+                  Spinを押してね！
+                </Text>
+              </CardBody>
+            </Card>
+
             <Roulette isSpinning={isSpinning} setIsSpinEnd={setIsSpinEnd} />
             <Button
               bgColor={"yellow.400"}
               textColor={"white"}
-              fontSize={"40px"}
-              boxSize={"150px"}
+              fontSize={"30px"}
+              width={"240px"}
+              height={"100px"}
               margin={"auto"}
               mt={"8"}
               disabled={isSpinning}
@@ -88,11 +99,19 @@ export const Spin: FC = () => {
               <ModalContent>
                 <ModalHeader>おめでとうございます！</ModalHeader>
                 <ModalBody>
-                  <Box>
+                  <Box
+                    display={"flex"}
+                    flexDirection={"column"}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                  >
                     <Text fontSize="md">
-                      Amazonギフト券{amount}円分を
+                      Amazonギフト券<b>{amount}円分</b>をプレゼント！
                       <br />
-                      プレゼントいたします！
+                      参加いただきありがとうございました！
+                      <br />
+                      <br />
+                      ※ボタンを押すとAmazonギフト券のページに移動します。
                     </Text>
                     <Button
                       colorScheme="yellow"
