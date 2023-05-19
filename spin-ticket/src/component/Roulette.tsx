@@ -27,6 +27,8 @@ const rouletteColors = [
   "rgba(246, 173, 85, 1)",
 ];
 
+let img: p5Types.Image;
+
 const rouletteText = ["1000", "0", "1000", "0", "1000", "3000"];
 
 // 現在の角度
@@ -108,11 +110,22 @@ const drawNeedle = (p5: p5Types) => {
   p5.pop();
 };
 
+const drawCenterImage = (p5: p5Types) => {
+  p5.push();
+  const radius = 120;
+  const mask = p5.createGraphics(img.width, img.height);
+  mask.circle(mask.width / 2, mask.height / 2, radius);
+  img.mask(mask.get());
+  p5.image(img, -radius / 2, -radius / 2, radius, radius);
+  p5.pop();
+};
+
 export const Roulette: React.FC<Props> = (props: Props) => {
   const targetAngle = (props.targetNum * 60 + 14) % 360;
   const preload = (p5: p5Types) => {
-    // Load the pattern image
+    img = p5.loadImage("kings-logo.png");
   };
+
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(360, 360).parent(canvasParentRef);
 
@@ -130,6 +143,7 @@ export const Roulette: React.FC<Props> = (props: Props) => {
 
     drawRoulette(p5, angle);
     drawNeedle(p5);
+    drawCenterImage(p5);
     p5.loop();
   };
   return (

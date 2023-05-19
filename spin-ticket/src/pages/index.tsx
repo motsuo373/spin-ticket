@@ -1,13 +1,13 @@
 import Image from "next/image";
-import { Inter } from "next/font/google";
 import { Header } from "@/component/Header";
-
-const inter = Inter({ subsets: ["latin"] });
+import Layout from "@/component/Layout";
 
 export default function Home() {
   return (
-    <main>
-      <Header />
-    </main>
+    <Layout>
+      <main>
+        <Header />
+      </main>
+    </Layout>
   );
 }

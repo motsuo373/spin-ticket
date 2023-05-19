@@ -18,6 +18,8 @@ import {
 import { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import Head from "next/head";
+import Layout from "@/component/Layout";
 
 export const Spin: FC = () => {
   const [isSpinning, setIsSpinning] = useState(false);
@@ -50,14 +52,20 @@ export const Spin: FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <>
+    <Layout>
+      <Head>
+        {/* 以下の<style>タグを追加 */}
+        <style>{`
+          body {
+            background-color: rgba(47,133,90, 1);
+            margin: 0;
+            box-sizing: border-box;
+          }
+        `}</style>
+      </Head>
       <Header />
       {Object.keys(fetchData).length > 0 && (
-        <Container
-          maxW="container.xl"
-          height={"calc(100vh - 82px)"}
-          bgColor={"green.600"}
-        >
+        <Container maxW="container.xl" height={"100vh"} bgColor={"green.600"}>
           <Flex direction="column" alignItems="center" justifyContent="center">
             <Card bg="green.100" my={6}>
               <CardBody>
@@ -80,8 +88,8 @@ export const Spin: FC = () => {
               bgColor={"yellow.400"}
               textColor={"white"}
               fontSize={"30px"}
-              width={"240px"}
-              height={"100px"}
+              width={"200px"}
+              height={"60px"}
               margin={"auto"}
               mt={"8"}
               disabled={isSpinning}
@@ -112,7 +120,7 @@ export const Spin: FC = () => {
                     <Text fontSize="md">
                       Amazonギフト券<b>{amount}円分</b>をプレゼント！
                       <br />
-                      参加いただきありがとうございました！
+                      本日は参加いただきありがとうございました！
                       <br />
                       <br />
                       ※ボタンを押すとAmazonギフト券のページに移動します。
@@ -133,7 +141,7 @@ export const Spin: FC = () => {
           </Flex>
         </Container>
       )}
-    </>
+    </Layout>
   );
 };
 
