@@ -5,6 +5,29 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  let firebaseApp;
+
+  // Check if required environment variables are defined
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_PRIVATE_KEY ||
+    !process.env.FIREBASE_CLIENT_EMAIL
+  ) {
+    throw new Error("Missing Firebase environment variables.");
+  }
+
+  if (!admin.apps.length) {
+    firebaseApp = admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
+    });
+  } else {
+    firebaseApp = admin.app();
+  }
+
   const COLLECTION_NAME = "uuid";
 
   const db = admin.firestore();
@@ -37,29 +60,6 @@ export default async function handler(
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
-  let firebaseApp;
-
-  // Check if required environment variables are defined
-  if (
-    !process.env.FIREBASE_PROJECT_ID ||
-    !process.env.FIREBASE_PRIVATE_KEY ||
-    !process.env.FIREBASE_CLIENT_EMAIL
-  ) {
-    throw new Error("Missing Firebase environment variables.");
-  }
-
-  if (!admin.apps.length) {
-    firebaseApp = admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      }),
-    });
-  } else {
-    firebaseApp = admin.app();
   }
 
   try {
