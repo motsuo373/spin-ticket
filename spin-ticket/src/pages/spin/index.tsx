@@ -21,12 +21,26 @@ import axios from "axios";
 import Head from "next/head";
 import Layout from "@/component/Layout";
 
+// Define a custom type for fetchData
+type FetchDataType = {
+  amount: number;
+  link: string;
+  targetNum: number;
+  isUsed: boolean;
+};
+
 export const Spin: FC = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isSpinEnd, setIsSpinEnd] = useState(false);
   const router = useRouter();
 
-  const [fetchData, setFetchData] = useState<any>({});
+  // Use the defined type for fetchData state
+  const [fetchData, setFetchData] = useState<FetchDataType>({
+    amount: 0,
+    link: "",
+    targetNum: 0,
+    isUsed: false,
+  });
   const { amount, link, targetNum, isUsed } = fetchData;
 
   const { order } = router.query;
@@ -48,10 +62,10 @@ export const Spin: FC = () => {
     }
   }, [isSpinEnd]);
 
-  async function updateDocumentField(
+  async function updateDocumentField<T>(
     documentId: string,
-    field: any,
-    value: any
+    field: string,
+    value: T
   ) {
     try {
       const response = await fetch(`/api/user?documentId=${documentId}`, {
@@ -65,14 +79,13 @@ export const Spin: FC = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      const data = await response.json();
+      return;
     } catch (error) {
       console.error("Error updating document field:", error);
     }
   }
 
-  const getUser = async (documentId: any) => {
+  const getUser = async (documentId: string | string[]) => {
     try {
       const response = await axios.get("/api/user", {
         params: {

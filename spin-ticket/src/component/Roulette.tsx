@@ -70,7 +70,7 @@ let hasSpinToEnd = false;
 const updateAngleSpeed = (
   p5: p5Types,
   isSpinning: boolean,
-  setIsSpinEnd: any,
+  setIsSpinEnd: React.Dispatch<React.SetStateAction<boolean>>,
   targetAngle: number
 ) => {
   if (isSpinning) {
