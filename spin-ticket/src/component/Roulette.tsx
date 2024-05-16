@@ -112,19 +112,12 @@ const drawNeedle = (p5: p5Types) => {
 
 export const Roulette: React.FC<Props> = (props: Props) => {
   const targetAngle = (props.targetNum * 60 + 14) % 360;
-  const preload = (p5: p5Types) => {
-    img = p5.loadImage("kings-logo.png");
-  };
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     p5.createCanvas(360, 360).parent(canvasParentRef);
-
-    drawRoulette(p5, angle);
-    drawNeedle(p5);
   };
 
   const draw = (p5: p5Types) => {
-    p5.background("rgba(47,133,90, 1)");
     p5.translate(p5.width / 2, p5.height / 2);
 
     updateAngleSpeed(p5, props.isSpinning, props.setIsSpinEnd, targetAngle);
@@ -138,7 +131,7 @@ export const Roulette: React.FC<Props> = (props: Props) => {
   return (
     <>
       <Center h="100%">
-        <Sketch preload={preload} setup={setup} draw={draw} />
+        <Sketch setup={setup} draw={draw} />
       </Center>
     </>
   );
