@@ -29,7 +29,7 @@ const rouletteColors = [
 
 let img: p5Types.Image;
 
-const rouletteText = ["1000", "0", "1000", "0", "1000", "3000"];
+const rouletteText = ["shot", "1000", "shot", "1000", "shot", "3000"];
 
 // 現在の角度
 let angle = 0;

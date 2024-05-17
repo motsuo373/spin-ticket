@@ -1,5 +1,5 @@
 import { Header } from "@/component/Header";
-import Layout from "@/component/Layout";
+import { BellIcon } from "@chakra-ui/icons";
 import { Roulette } from "@/component/Roulette";
 import Seo from "@/component/Seo";
 import {
@@ -18,7 +18,10 @@ import {
   Image,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { FC, useEffect, useState } from "react";
+import axios from "axios";
+import { FC, useEffect, useState, useRef } from "react";
+import { Howl, Howler } from "howler";
+import { useRouter } from "next/router";
 
 // Define a custom type for fetchData
 type FetchDataType = {
@@ -28,8 +31,32 @@ type FetchDataType = {
   isUsed: boolean;
 };
 
+async function updateDocumentField<T>(
+  documentId: string,
+  field: string,
+  value: T
+) {
+  try {
+    const response = await fetch(`/api/user?documentId=${documentId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ field, value }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return;
+  } catch (error) {
+    console.error("Error updating document field:", error);
+  }
+}
+
 export const fortuneTicket: FC = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const firstModal = useDisclosure();
+  const finishModal = useDisclosure();
   // Use the defined type for fetchData state
   const [fetchData, setFetchData] = useState<FetchDataType>({
     amount: 0,
@@ -37,13 +64,83 @@ export const fortuneTicket: FC = () => {
     targetNum: 0,
     isUsed: false,
   });
-  const { amount, link, targetNum, isUsed } = fetchData;
-
-  useEffect(() => {
-    onOpen();
-  }, []);
   const [isSpinning, setIsSpinning] = useState(false);
   const [isSpinEnd, setIsSpinEnd] = useState(false);
+  const router = useRouter();
+  const backgroundMusicRef = useRef<Howl | null>(null);
+  const zannenSound = new Howl({
+    src: ["/wav/zannen.wav"],
+  });
+  const omedetoSound = new Howl({
+    src: ["/wav/omedeto.wav"],
+  });
+  const ooatariSound = new Howl({
+    src: ["/wav/ooatari.wav"],
+  });
+
+  const { amount, link, targetNum, isUsed } = fetchData;
+  const { order } = router.query;
+
+  const playSE = (amount: number) => {
+    if (amount === 0) {
+      zannenSound.play();
+    } else if (amount === 1000) {
+      omedetoSound.play();
+    } else {
+      ooatariSound.play();
+    }
+  };
+
+  useEffect(() => {
+    if (!isUsed) {
+      firstModal.onOpen();
+    } else {
+      playSE(amount);
+    }
+  }, [isUsed]);
+
+  useEffect(() => {
+    if (order) {
+      getUser(order);
+    }
+  }, [order]);
+
+  useEffect(() => {
+    if (isSpinEnd && backgroundMusicRef.current) {
+      if (typeof order === "string") {
+        updateDocumentField(order, "isUsed", true);
+        updateDocumentField(order, "updateAt", new Date());
+      } else {
+        console.error("Invalid order value:", order);
+      }
+      backgroundMusicRef.current.pause();
+      playSE(amount);
+    }
+  }, [isSpinEnd]);
+
+  const getUser = async (documentId: string | string[]) => {
+    try {
+      const response = await axios.get("/api/user", {
+        params: {
+          documentId,
+        },
+      });
+      setFetchData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleMusicPlay = () => {
+    if (!backgroundMusicRef.current) {
+      backgroundMusicRef.current = new Howl({
+        src: ["/wav/mokugyo.wav"],
+        loop: true, // ループを有効にする
+        volume: 0.5, // 音量を半分にする
+      });
+    }
+    backgroundMusicRef.current.play();
+  };
 
   return (
     <>
@@ -60,7 +157,8 @@ export const fortuneTicket: FC = () => {
       <Header />
       <Box
         w="100vw"
-        h="88vh"
+        h="100vh"
+        minH="567px"
         bgImage="url('/background.webp')"
         bgPosition="center"
         bgRepeat="no-repeat"
@@ -90,34 +188,81 @@ export const fortuneTicket: FC = () => {
           </Button>
 
           <Link href="/jinguuji/banner">
-            <Image
-              src="/ad-dummy.png"
-              alt="ad-dummy"
-              position="absolute"
-              bottom="0"
-              left="0"
-              w="100%"
-              // maxH="20vh" // 画像の高さを調整
-              maxW="500px"
-              objectFit="cover"
-            />
+            <Image src="/ad-dummy.png" alt="ad-dummy" marginTop={"20"} />
           </Link>
         </VStack>
       </Box>
-      <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+      <Modal
+        isOpen={!isUsed && firstModal.isOpen}
+        onClose={firstModal.onClose}
+        size={"xl"}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>ナイスラッキーカード！</ModalHeader>
           <ModalBody>
             <img src="jinnguuji_money.png" alt="Jinnguuji" />
-            <p>このサイトは音声が流れます。</p>
-            <p>音をONにして進んでください。</p>
+            <Text fontSize="md" marginTop={"4"}>
+              このサイトは<b>音声</b>が流れます。
+              <br />
+              音をONにして進んでください。
+            </Text>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose} colorScheme="teal">
-              OK
+            <Button
+              onClick={() => {
+                firstModal.onClose();
+                handleMusicPlay();
+              }}
+              colorScheme="yellow"
+              textColor={"white"}
+            >
+              音をONにした！
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isSpinEnd || isUsed}
+        onClose={finishModal.onClose}
+        size={"xl"}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {amount === 0 ? "オーマイガー！" : "おめでとうございます！"}
+          </ModalHeader>
+          <ModalBody>
+            {amount === 0 ? (
+              <>
+                <img src="fire.png" alt="Jinnguuji" />
+                <Text fontSize="md" marginTop={"4"}>
+                  ショットプレゼント！！！
+                </Text>
+              </>
+            ) : (
+              <>
+                <img src="jinnguuji_drink.jpg" alt="Jinnguuji" />
+                <Text fontSize="md" marginTop={"4"}>
+                  Amazonギフト券<b>{amount}円分</b>をプレゼント！
+                  <br />
+                  <br />
+                  なるべく早くAmazonギフト券を受け取ってください！
+                  <br />
+                  ※ボタンを押すとAmazonギフト券のページに移動します。
+                </Text>
+                <Button
+                  colorScheme="yellow"
+                  variant="outline"
+                  my={"4"}
+                  as="a"
+                  href={link}
+                >
+                  ギフト券をもらう
+                </Button>
+              </>
+            )}
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
